@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ holds class User"""
 from models.base_model import BaseModel, Base
+from models.review import Review
 from os import getenv
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String

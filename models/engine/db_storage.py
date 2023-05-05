@@ -17,16 +17,13 @@ class DBStorage:
 
     def __init__(self):
         """initialises class and start cinnection"""
-        hbnb_dev = getenv('HBNB_MYSQL_USER')
+        hbnb_dev_user = getenv('HBNB_MYSQL_USER')
         hbnb_dev_pwd = getenv('HBNB_MYSQL_PWD')
         host = getenv('HBNB_MYSQL_HOST')
         hbnb_dev_db = getenv('HBNB_MYSQL_DB')
-        db_url = "mysql+mysqldb://{}:{}@{}:3306/{}".format(
-            hbnb_dev, hbnb_dev_pwd, host, hbnb_dev_db)
-        self.__engine = create_engine(db_url, pool_pre_ping=True)
-
+        self_engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(hbnb_dev_user, hbnb_dev_pwd, host, hbnb_dev_db), pool_pre_ping=True)
         if getenv('HBNB_ENV') == 'test':
-            Base.metadata.drop_all(bind=self.__engine)
+            Base.metadata.drop_all(self.__engine)
 
 
     def all(self, cls=None):

@@ -9,21 +9,17 @@ import models
 
 class State(BaseModel, Base):
     """ State class """
-    if getenv('HBNB_TYPE_STORAGE') == 'db':
-        __tablename__ = "states"
-        name = Column(String(128), nullable=False)
-        cities = relationship("City", cascade="all, delete, delete-orphan", backref="state")
-    else:
-        name = ""
-        cities = ""
+    __tablename__ = "states"
+    name = Column(String(128), nullable=False)
+    cities = relationship("City", cascade="all, delete, delete-orphan", backref="state")
 
-    if getenv('HBNB_TYPE_STORAGE') != 'db':
-        @property
-        def cities(self):
-            """getter  attr to return list of cjty jnstance"""
-            cities_val = models.storage.all("City").values()
-            city_list = []
-            for city in cities_val:
-                if city.state_id == self.id:
-                    city_list.append(city)
-            return city_list
+    @property
+    def cities(self):
+        """getter  attr to return list of cjty jnstance"""
+        cities_val = models.storage.all("City").values()
+        city_list = []
+        for city in cities_val:
+            if city.state_id == self.id:
+                city_list.append(city)
+
+                return city_list

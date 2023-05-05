@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 """ holds class User"""
-import hashlib
-import models
 from models.base_model import BaseModel, Base
 from models.review import Review
 from os import getenv

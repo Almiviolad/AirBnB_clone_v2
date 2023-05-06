@@ -17,8 +17,6 @@ def do_deploy(archive_path):
         path = archive_path
         file_name = path.split('/')[-1]
         put(path, '/tmp/{}'.format(file_name))
-
-        print(file_name, file_name.split('.')[0])
         run('mkdir -p /data/web_static/releases/{}'.format(file_name.split('.')[0]))
         run('tar -xzf /tmp/{} -C /data/web_static/releases/{}/'
             .format(file_name, file_name.split('.')[0]))
@@ -31,5 +29,4 @@ def do_deploy(archive_path):
         return True
 
     except Exception as e:
-        print(e)
         return False

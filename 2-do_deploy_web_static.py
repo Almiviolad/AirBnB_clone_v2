@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """distributes archives to web servers"""
 
-
+from datetime import datetime
 from fabric.api import *
 import os.path
 
@@ -14,20 +14,34 @@ def do_deploy(archive_path):
         return False
 
     try:
-        path = archive_path
-        file_name = path.split('/')[-1]
-        put(path, '/tmp/{}'.format(file_name))
-        run('mkdir -p /data/web_static/releases/{}'.format(
-            file_name.split('.')[0]))
-        run('tar -xzf /tmp/{} -C /data/web_static/releases/{}/'
-            .format(file_name, file_name.split('.')[0]))
-        run('rm -rf /data/web_static/releases/{}/web_static'.format(
-            file_name.split('.')[0]))
-        run('rm -rf /data/web_static/current')
-        # Create new symbolic link /data/web_static/current
-        run('ln -s /data/web_static/releases/{}/ \
-            /data/web_static/current'.format(file_name.split('.')[0]))
-        return True
+        put(archive_path, '/tmp/')
 
-    except Exception as e:
+        
+        timestamp = archive_path[-18:-4]
+        run('sudo mkdir -p /data/web_static/\releases/web_static_{}/'.format(timestamp))
+        # uncompress archive and delete .tgz
+        run('sudo tar -xzf /tmp/web_static_{}.tgz -C \
+        /data/web_static/releases/web_static_{}/'
+            .format(timestamp, timestamp))
+
+        # remove archive
+        run('sudo rm /tmp/web_static_{}.tgz'.format(timestamp))
+        # move contents into host web_static
+        run('sudo mv /data/web_static/releases/web_static_{}/web_static/* \
+        /data/web_static/releases/web_static_{}/'.format(timestamp, timestamp))
+        # remove extraneous web_static dir
+        run('sudo rm -rf /data/web_static/releases/\
+web_static_{}/web_static'
+            .format(timestamp))
+
+        # delete pre-existing sym link
+        run('sudo rm -rf /data/web_static/current')
+
+        # re-establish symbolic link
+        run('sudo ln -s /data/web_static/releases/\
+        web_static_{}/ /data/web_static/current'.format(timestamp))
+        return True
+    except:
         return False
+
+        

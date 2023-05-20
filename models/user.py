@@ -1,20 +1,52 @@
 #!/usr/bin/python3
 """ holds class User"""
+import hashlib
+import models
 from models.base_model import BaseModel, Base
+<<<<<<< HEAD
 from sqlalchemy.ext.declarative import declarative_base
 from models.review import Review
+=======
+>>>>>>> 82da1cde10326cbee2cfe65b71bd18eed974df2b
 from os import getenv
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String
-from models.place import Place
-from models.review import Review
+
 
 class User(BaseModel, Base):
-    """user class model"""
-    __tablename__ = "users"
-    email = Column(String(128), nullable=False)
-    password = Column(String(128), nullable=False)
-    first_name = Column(String(128), nullable=True)
-    last_name = Column(String(128), nullable=True)
-    places = relationship("Place", cascade='all, delete, delete-orphan', backref="user")
-    reviews = relationship("Review", cascade='all, delete, delete-orphan', backref="user")
+    """Representation of a user """
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
+        __tablename__ = 'users'
+        email = Column(String(128),
+                       nullable=False)
+        _password = Column('password',
+                           String(128),
+                           nullable=False)
+        first_name = Column(String(128),
+                            nullable=True)
+        last_name = Column(String(128),
+                           nullable=True)
+        places = relationship("Place",
+                              backref="user",
+                              cascade="all, delete-orphan")
+        reviews = relationship("Review",
+                               backref="user",
+                               cascade="all, delete-orphan")
+    else:
+        email = ""
+        _password = ""
+        first_name = ""
+        last_name = ""
+
+    def __init__(self, *args, **kwargs):
+        """initializes user"""
+        super().__init__(*args, **kwargs)
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, pwd):
+        """hashing password values"""
+        self._password = pwd

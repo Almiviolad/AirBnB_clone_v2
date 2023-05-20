@@ -1,22 +1,21 @@
 #!/usr/bin/python3
-""" State Module for HBNB project """
-from models.base_model import BaseModel, Base
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Integer, Column, String
-from sqlalchemy.orm import relationship
-from os import getenv
+""" holds class State"""
 import models
+from models.base_model import BaseModel, Base
+from os import getenv
+import sqlalchemy
+from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
 
 
 class State(BaseModel, Base):
-    """ State class """
+    """Representation of state """
     if getenv('HBNB_TYPE_STORAGE') == 'db':
-        __tablename__ = "states"
-        name = Column(String(128), nullable=False)
-        cities = relationship(
-            "City",
-            cascade="all, delete, delete-orphan",
-            backref="state")
+        __tablename__ = 'states'
+        name = Column(String(128),
+                      nullable=False)
+        cities = relationship("City", cascade="all, delete",
+                              backref="states")
     else:
         name = ""
 
@@ -27,10 +26,10 @@ class State(BaseModel, Base):
     if getenv('HBNB_TYPE_STORAGE') != 'db':
         @property
         def cities(self):
-            """getter  attr to return list of cjty jnstance"""
-            cities_val = models.storage.all("City").values()
-            city_list = []
-            for city in cities_val:
+            """fs getter attribute that returns City instances"""
+            values_city = models.storage.all("City").values()
+            list_city = []
+            for city in values_city:
                 if city.state_id == self.id:
-                    city_list.append(city)
-                    return city_list
+                    list_city.append(city)
+            return list_city

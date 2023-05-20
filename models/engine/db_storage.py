@@ -29,20 +29,6 @@ class DBStorage:
     __session = None
 
     def __init__(self):
-        """initialises class and start cinnection"""
-        hbnb_dev_user = os.getenv('HBNB_MYSQL_USER')
-        hbnb_dev_pwd = os.getenv('HBNB_MYSQL_PWD')
-        host = os.getenv('HBNB_MYSQL_HOST')
-        hbnb_dev_db = os.getenv('HBNB_MYSQL_DB')
-        self_engine = create_engine(
-            'mysql+mysqldb://{}:{}@{}/{}'.format(
-                hbnb_dev_user,
-                hbnb_dev_pwd,
-                host,
-                hbnb_dev_db),
-            pool_pre_ping=True)
-        if os.getenv('HBNB_ENV') == 'test':
-            Base.metadata.drop_all(self.__engine)
         """Initializes the object"""
         user = os.getenv('HBNB_MYSQL_USER')
         passwd = os.getenv('HBNB_MYSQL_PWD')
@@ -58,7 +44,7 @@ class DBStorage:
         if not self.__session:
             self.reload()
         objects = {}
-        if isinstance(cls, str):
+        if type(cls) == str:
             cls = name2class.get(cls, None)
         if cls:
             for obj in self.__session.query(cls):
@@ -97,8 +83,8 @@ class DBStorage:
 
     def get(self, cls, id):
         """Retrieve an object"""
-        if cls is not None and isinstance(cls, str) and id is not None and\
-           isinstance(id, str) and cls in name2class:
+        if cls is not None and type(cls) is str and id is not None and\
+           type(id) is str and cls in name2class:
             cls = name2class[cls]
             result = self.__session.query(cls).filter(cls.id == id).first()
             return result
@@ -108,14 +94,10 @@ class DBStorage:
     def count(self, cls=None):
         """Count number of objects in storage"""
         total = 0
-        if isinstance(cls, str) and cls in name2class:
+        if type(cls) == str and cls in name2class:
             cls = name2class[cls]
             total = self.__session.query(cls).count()
         elif cls is None:
             for cls in name2class.values():
                 total += self.__session.query(cls).count()
         return total
-
-    def close(self):
-        """ rmoves db session"""
-        self.__session.remove()

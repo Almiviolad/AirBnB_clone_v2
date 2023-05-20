@@ -3,8 +3,8 @@
 connection.
 """
 
-import os
 from models.base_model import Base
+from sqlalchemy.ext.declarative import declarative_base
 from models.amenity import Amenity
 from models.city import City
 from models.place import Place
@@ -13,6 +13,7 @@ from models.review import Review
 from models.user import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
+from os import getenv
 name2class = {
     'Amenity': Amenity,
     'City': City,
@@ -29,22 +30,13 @@ class DBStorage:
     __session = None
 
     def __init__(self):
-        """initialises class and start cinnection"""
-        hbnb_dev_user = getenv('HBNB_MYSQL_USER')
-        hbnb_dev_pwd = getenv('HBNB_MYSQL_PWD')
-        host = getenv('HBNB_MYSQL_HOST')
-        hbnb_dev_db = getenv('HBNB_MYSQL_DB')
-        self_engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(hbnb_dev_user, hbnb_dev_pwd, host, hbnb_dev_db), pool_pre_ping=True)
+        """initialises class and start connection"""
+        HBNB_MYSQL_USER = getenv('HBNB_MYSQL_USER')
+        HBNB_MYSQL_PWD = getenv('HBNB_MYSQL_PWD')
+        HBNB_MYSQL_HOST = getenv('HBNB_MYSQL_HOST')
+        HBNB_MYSQL_DB = getenv('HBNB_MYSQL_DB')
+        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(HBNB_MYSQL_USER, HBNB_MYSQL_PWD, HBNB_MYSQL_HOST, HBNB_MYSQL_DB), pool_pre_ping=True)
         if getenv('HBNB_ENV') == 'test':
-            Base.metadata.drop_all(self.__engine)
-        """Initializes the object"""
-        user = os.getenv('HBNB_MYSQL_USER')
-        passwd = os.getenv('HBNB_MYSQL_PWD')
-        host = os.getenv('HBNB_MYSQL_HOST')
-        database = os.getenv('HBNB_MYSQL_DB')
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                      .format(user, passwd, host, database))
-        if os.getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
     def all(self, cls=None):
         """returns a dictionary of all the objects present"""
@@ -64,10 +56,9 @@ class DBStorage:
 
     def reload(self):
         """reloads objects from the database"""
-        session_factory = sessionmaker(bind=self.__engine,
-                                       expire_on_commit=False)
         Base.metadata.create_all(self.__engine)
-        self.__session = scoped_session(session_factory)
+        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__session = scoped_session(session_factory)()
 
     def new(self, obj):
         """creates a new object"""

@@ -3,11 +3,6 @@
 import hashlib
 import models
 from models.base_model import BaseModel, Base
-<<<<<<< HEAD
-from sqlalchemy.ext.declarative import declarative_base
-from models.review import Review
-=======
->>>>>>> 82da1cde10326cbee2cfe65b71bd18eed974df2b
 from os import getenv
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String

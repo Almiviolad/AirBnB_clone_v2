@@ -30,12 +30,18 @@ class DBStorage:
 
     def __init__(self):
         """initialises class and start cinnection"""
-        hbnb_dev_user = getenv('HBNB_MYSQL_USER')
-        hbnb_dev_pwd = getenv('HBNB_MYSQL_PWD')
-        host = getenv('HBNB_MYSQL_HOST')
-        hbnb_dev_db = getenv('HBNB_MYSQL_DB')
-        self_engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(hbnb_dev_user, hbnb_dev_pwd, host, hbnb_dev_db), pool_pre_ping=True)
-        if getenv('HBNB_ENV') == 'test':
+        hbnb_dev_user = os.getenv('HBNB_MYSQL_USER')
+        hbnb_dev_pwd = os.getenv('HBNB_MYSQL_PWD')
+        host = os.getenv('HBNB_MYSQL_HOST')
+        hbnb_dev_db = os.getenv('HBNB_MYSQL_DB')
+        self_engine = create_engine(
+            'mysql+mysqldb://{}:{}@{}/{}'.format(
+                hbnb_dev_user,
+                hbnb_dev_pwd,
+                host,
+                hbnb_dev_db),
+            pool_pre_ping=True)
+        if os.getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
         """Initializes the object"""
         user = os.getenv('HBNB_MYSQL_USER')
@@ -46,12 +52,13 @@ class DBStorage:
                                       .format(user, passwd, host, database))
         if os.getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
+
     def all(self, cls=None):
         """returns a dictionary of all the objects present"""
         if not self.__session:
             self.reload()
         objects = {}
-        if type(cls) == str:
+        if isinstance(cls, str):
             cls = name2class.get(cls, None)
         if cls:
             for obj in self.__session.query(cls):
@@ -90,8 +97,8 @@ class DBStorage:
 
     def get(self, cls, id):
         """Retrieve an object"""
-        if cls is not None and type(cls) is str and id is not None and\
-           type(id) is str and cls in name2class:
+        if cls is not None and isinstance(cls, str) and id is not None and\
+           isinstance(id, str) and cls in name2class:
             cls = name2class[cls]
             result = self.__session.query(cls).filter(cls.id == id).first()
             return result
@@ -101,10 +108,14 @@ class DBStorage:
     def count(self, cls=None):
         """Count number of objects in storage"""
         total = 0
-        if type(cls) == str and cls in name2class:
+        if isinstance(cls, str) and cls in name2class:
             cls = name2class[cls]
             total = self.__session.query(cls).count()
         elif cls is None:
             for cls in name2class.values():
                 total += self.__session.query(cls).count()
         return total
+
+    def close(self):
+        """ rmoves db session"""
+        self.__session.remove()

@@ -7,19 +7,30 @@ from sqlalchemy.orm import relationship
 from os import getenv
 import models
 
+
 class State(BaseModel, Base):
     """ State class """
-    __tablename__ = "states"
-    name = Column(String(128), nullable=False)
-    cities = relationship("City", cascade="all, delete, delete-orphan", backref="state")
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
+        __tablename__ = "states"
+        name = Column(String(128), nullable=False)
+        cities = relationship(
+            "City",
+            cascade="all, delete, delete-orphan",
+            backref="state")
+    else:
+        name = ""
 
-    @property
-    def cities(self):
-        """getter  attr to return list of cjty jnstance"""
-        cities_val = models.storage.all("City").values()
-        city_list = []
-        for city in cities_val:
-            if city.state_id == self.id:
-                city_list.append(city)
+    def __init__(self, *args, **kwargs):
+        """initializes state"""
+        super().__init__(*args, **kwargs)
 
-                return city_list
+    if getenv('HBNB_TYPE_STORAGE') != 'db':
+        @property
+        def cities(self):
+            """getter  attr to return list of cjty jnstance"""
+            cities_val = models.storage.all("City").values()
+            city_list = []
+            for city in cities_val:
+                if city.state_id == self.id:
+                    city_list.append(city)
+                    return city_list

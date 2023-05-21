@@ -13,7 +13,7 @@ from models.review import Review
 from models.user import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from os import getenv
+import os
 name2class = {
     'Amenity': Amenity,
     'City': City,

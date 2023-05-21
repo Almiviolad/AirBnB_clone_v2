@@ -3,8 +3,8 @@
 connection.
 """
 
-import os
 from models.base_model import Base
+from sqlalchemy.ext.declarative import declarative_base
 from models.amenity import Amenity
 from models.city import City
 from models.place import Place
@@ -13,6 +13,7 @@ from models.review import Review
 from models.user import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
+from os import getenv
 name2class = {
     'Amenity': Amenity,
     'City': City,
@@ -57,10 +58,9 @@ class DBStorage:
 
     def reload(self):
         """reloads objects from the database"""
-        session_factory = sessionmaker(bind=self.__engine,
-                                       expire_on_commit=False)
         Base.metadata.create_all(self.__engine)
-        self.__session = scoped_session(session_factory)
+        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__session = scoped_session(session_factory)()
 
     def new(self, obj):
         """creates a new object"""

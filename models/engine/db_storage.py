@@ -5,22 +5,22 @@ connection.
 
 from models.base_model import Base
 from sqlalchemy.ext.declarative import declarative_base
-from models.amenity import Amenity
+#from models.amenity import Amenity
 from models.city import City
-from models.place import Place
+#from models.place import Place
 from models.state import State
 from models.review import Review
-from models.user import User
+#from models.user import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from os import getenv
+import os
 name2class = {
-    'Amenity': Amenity,
+   # 'Amenity': Amenity,
     'City': City,
-    'Place': Place,
+   # 'Place': Place,
     'State': State,
     'Review': Review,
-    'User': User
+   # 'User': User
 }
 
 
@@ -36,7 +36,7 @@ class DBStorage:
         host = os.getenv('HBNB_MYSQL_HOST')
         database = os.getenv('HBNB_MYSQL_DB')
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                      .format(user, passwd, host, database))
+                                      .format(user, passwd, host, database), pool_pre_ping=True)
         if os.getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
 
@@ -60,7 +60,8 @@ class DBStorage:
         """reloads objects from the database"""
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        self.__session = scoped_session(session_factory)()
+        Session = scoped_session(session_factory)
+        self.__session = Session()
 
     def new(self, obj):
         """creates a new object"""

@@ -6,22 +6,23 @@ from os import getenv
 import sqlalchemy
 from sqlalchemy import Column, String, Integer, Float, Table, ForeignKey
 from sqlalchemy.orm import relationship
-#if getenv('HBNB_TYPE_STORAGE') == 'db':
-place_amenity = Table('place_amenity', Base.metadata,
-                        Column('place_id',
-                                String(60),
-                                ForeignKey('places.id'),
-                                primary_key=True,
-                                nullable=False),
-                        Column('amenity_id',
-                                String(60),
-                                ForeignKey('amenities.id'),
-                                primary_key=True,
-                                nullable=False))
+from models.amenity import Amenity
+from models.review import Review
 
+associate_table = Table('place_amenity', Base.metadata,
+                      Column('place_id',
+                             String(60),
+                             ForeignKey('places.id'),
+                             primary_key=True,
+                             nullable=False),
+                      Column('amenity_id',
+                             String(60),
+                             ForeignKey('amenities.id'),
+                             primary_key=True,
+                             nullable=False))
 
 class Place(BaseModel, Base):
-    """Representation of Place """
+    """Representation of Place"""
     if getenv('HBNB_TYPE_STORAGE') == 'db':
         __tablename__ = 'places'
         city_id = Column(String(60),
@@ -51,9 +52,8 @@ class Place(BaseModel, Base):
         reviews = relationship("Review", cascade="all, delete",
                                backref="place")
         amenities = relationship("Amenity",
-                                 secondary=place_amenity,
-                                 viewonly=False,
-                                 backref="place_amenities")
+                                 secondary='place_amenity',
+                                 viewonly=False)
     else:
         city_id = ""
         user_id = ""
@@ -68,7 +68,7 @@ class Place(BaseModel, Base):
         amenity_ids = []
 
     def __init__(self, *args, **kwargs):
-        """initializes Place"""
+        """Initializes Place"""
         super().__init__(*args, **kwargs)
 
     @property

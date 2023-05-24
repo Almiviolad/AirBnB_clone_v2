@@ -6,7 +6,8 @@ from os import getenv
 import sqlalchemy
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-
+from models.city import City
+from sqlalchemy.ext.declarative import declarative_base
 
 class State(BaseModel, Base):
     """Representation of state """

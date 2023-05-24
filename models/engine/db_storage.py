@@ -5,22 +5,22 @@ connection.
 
 from models.base_model import Base
 from sqlalchemy.ext.declarative import declarative_base
-#from models.amenity import Amenity
+from models.amenity import Amenity
 from models.city import City
-#from models.place import Place
+from models.place import Place
 from models.state import State
 from models.review import Review
-#from models.user import User
+from models.user import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 import os
 name2class = {
-   # 'Amenity': Amenity,
+    'Amenity': Amenity,
     'City': City,
-   # 'Place': Place,
+    'Place': Place,
     'State': State,
     'Review': Review,
-   # 'User': User
+    'User': User
 }
 
 
@@ -45,7 +45,7 @@ class DBStorage:
         if not self.__session:
             self.reload()
         objects = {}
-        if type(cls) == str:
+        if isinstance(cls, str):
             cls = name2class.get(cls, None)
         if cls:
             for obj in self.__session.query(cls):
@@ -59,10 +59,10 @@ class DBStorage:
     def reload(self):
         """reloads objects from the database"""
         Base.metadata.create_all(self.__engine)
+
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
-
     def new(self, obj):
         """creates a new object"""
         self.__session.add(obj)
